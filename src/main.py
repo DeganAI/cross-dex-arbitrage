@@ -771,35 +771,50 @@ async def detect_arbitrage(request: ArbitrageRequest):
         )
 
 
-# AP2 Entrypoint
+# AP2 Entrypoint - GET/HEAD for x402 discovery
+@app.get("/entrypoints/cross-dex-arbitrage/invoke")
+@app.head("/entrypoints/cross-dex-arbitrage/invoke")
+async def entrypoint_arbitrage_get():
+    """
+    x402 discovery endpoint - returns HTTP 402 for x402scan registration
+    """
+    base_url = os.getenv("BASE_URL", "https://cross-dex-arbitrage-production.up.railway.app")
+
+    return JSONResponse(
+        status_code=402,
+        content={
+            "x402Version": 1,
+            "accepts": [{
+                "scheme": "exact",
+                "network": "base",
+                "maxAmountRequired": "50000",  # 0.05 USDC in smallest units
+                "resource": f"{base_url}/entrypoints/cross-dex-arbitrage/invoke",
+                "description": "Cross DEX Arbitrage Alert - Find profitable arbitrage opportunities",
+                "mimeType": "application/json",
+                "payTo": payment_address,
+                "maxTimeoutSeconds": 30,
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # Base USDC
+            }]
+        }
+    )
+
+
+# AP2 Entrypoint - POST for actual requests
 @app.post("/entrypoints/cross-dex-arbitrage/invoke")
-async def entrypoint_arbitrage(request: ArbitrageRequest, x_payment_txhash: Optional[str] = None):
+async def entrypoint_arbitrage_post(request: Optional[ArbitrageRequest] = None, x_payment_txhash: Optional[str] = None):
     """
     AP2 (Agent Payments Protocol) compatible entrypoint
 
     Returns 402 if no payment provided (FREE_MODE overrides this for testing).
     Calls the main /arbitrage endpoint with the same logic if payment is valid.
     """
+    # Return 402 if no request body provided
+    if request is None:
+        return await entrypoint_arbitrage_get()
+
     # In FREE_MODE, bypass payment check
     if not free_mode and not x_payment_txhash:
-        # Return 402 with x402 payment schema
-        return JSONResponse(
-            status_code=402,
-            content={
-                "x402Version": 1,
-                "accepts": [{
-                    "scheme": "exact",
-                    "network": "base",
-                    "maxAmountRequired": "50000",  # 0.05 USDC in smallest units
-                    "resource": f"{os.getenv('BASE_URL', 'https://cross-dex-arbitrage-production.up.railway.app')}/entrypoints/cross-dex-arbitrage/invoke",
-                    "description": "Cross DEX Arbitrage Alert - Find profitable arbitrage opportunities",
-                    "mimeType": "application/json",
-                    "payTo": payment_address,
-                    "maxTimeoutSeconds": 30,
-                    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # Base USDC
-                }]
-            }
-        )
+        return await entrypoint_arbitrage_get()
 
     return await detect_arbitrage(request)
 
