@@ -12,6 +12,10 @@ import os
 import logging
 from datetime import datetime
 from web3 import Web3
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from src.dex_integrations import DEXIntegration, COMMON_TOKENS
 from src.gas_calculator import initialize_gas_calculator, CHAIN_CONFIG
@@ -769,12 +773,34 @@ async def detect_arbitrage(request: ArbitrageRequest):
 
 # AP2 Entrypoint
 @app.post("/entrypoints/cross-dex-arbitrage/invoke")
-async def entrypoint_arbitrage(request: ArbitrageRequest):
+async def entrypoint_arbitrage(request: ArbitrageRequest, x_payment_txhash: Optional[str] = None):
     """
     AP2 (Agent Payments Protocol) compatible entrypoint
 
-    Calls the main /arbitrage endpoint with the same logic.
+    Returns 402 if no payment provided (FREE_MODE overrides this for testing).
+    Calls the main /arbitrage endpoint with the same logic if payment is valid.
     """
+    # In FREE_MODE, bypass payment check
+    if not free_mode and not x_payment_txhash:
+        # Return 402 with x402 payment schema
+        return JSONResponse(
+            status_code=402,
+            content={
+                "x402Version": 1,
+                "accepts": [{
+                    "scheme": "exact",
+                    "network": "base",
+                    "maxAmountRequired": "50000",  # 0.05 USDC in smallest units
+                    "resource": f"{os.getenv('BASE_URL', 'https://cross-dex-arbitrage-production.up.railway.app')}/entrypoints/cross-dex-arbitrage/invoke",
+                    "description": "Cross DEX Arbitrage Alert - Find profitable arbitrage opportunities",
+                    "mimeType": "application/json",
+                    "payTo": payment_address,
+                    "maxTimeoutSeconds": 30,
+                    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # Base USDC
+                }]
+            }
+        )
+
     return await detect_arbitrage(request)
 
 
