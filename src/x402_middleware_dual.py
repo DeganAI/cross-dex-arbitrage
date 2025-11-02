@@ -160,6 +160,53 @@ class X402Middleware(BaseHTTPMiddleware):
                     "payTo": self.payment_address,
                     "maxTimeoutSeconds": 30,
                     "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # USDC on Base
+                    "inputSchema": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                            "token_in": {
+                                "type": "string",
+                                "description": "Input token address or symbol"
+                            },
+                            "token_out": {
+                                "type": "string",
+                                "description": "Output token address or symbol"
+                            },
+                            "amount_in": {
+                                "type": "string",
+                                "description": "Amount to swap in token units"
+                            },
+                            "chain_id": {
+                                "type": "number",
+                                "description": "Chain ID to scan DEXes on"
+                            }
+                        },
+                        "required": ["token_in", "token_out", "amount_in", "chain_id"]
+                    },
+                    "outputSchema": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "description": "Cross-DEX arbitrage opportunities with profit calculations",
+                        "properties": {
+                            "token_in": {
+                                "type": "string",
+                                "description": "Input token address or symbol"
+                            },
+                            "token_out": {
+                                "type": "string",
+                                "description": "Output token address or symbol"
+                            },
+                            "amount_in": {
+                                "type": "string",
+                                "description": "Amount to swap in token units"
+                            },
+                            "chain_id": {
+                                "type": "number",
+                                "description": "Chain ID to scan DEXes on"
+                            }
+                        },
+                        "required": ["token_in", "token_out", "amount_in", "chain_id"]
+                    }
                 }
             ]
         }
@@ -225,6 +272,53 @@ class X402Middleware(BaseHTTPMiddleware):
                         "payTo": self.payment_address,
                         "maxTimeoutSeconds": 30,
                         "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                        "inputSchema": {
+                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                            "type": "object",
+                            "properties": {
+                                "token_in": {
+                                    "type": "string",
+                                    "description": "Input token address or symbol"
+                                },
+                                "token_out": {
+                                    "type": "string",
+                                    "description": "Output token address or symbol"
+                                },
+                                "amount_in": {
+                                    "type": "string",
+                                    "description": "Amount to swap in token units"
+                                },
+                                "chain_id": {
+                                    "type": "number",
+                                    "description": "Chain ID to scan DEXes on"
+                                }
+                            },
+                            "required": ["token_in", "token_out", "amount_in", "chain_id"]
+                        },
+                        "outputSchema": {
+                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                            "type": "object",
+                            "description": "Cross-DEX arbitrage opportunities with profit calculations",
+                            "properties": {
+                                "token_in": {
+                                    "type": "string",
+                                    "description": "Input token address or symbol"
+                                },
+                                "token_out": {
+                                    "type": "string",
+                                    "description": "Output token address or symbol"
+                                },
+                                "amount_in": {
+                                    "type": "string",
+                                    "description": "Amount to swap in token units"
+                                },
+                                "chain_id": {
+                                    "type": "number",
+                                    "description": "Chain ID to scan DEXes on"
+                                }
+                            },
+                            "required": ["token_in", "token_out", "amount_in", "chain_id"]
+                        }
                     }]
                 }
             )
