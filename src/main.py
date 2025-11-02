@@ -807,52 +807,19 @@ async def entrypoint_arbitrage_get():
                 "payTo": payment_address,
                 "maxTimeoutSeconds": 30,
                 "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",  # Base USDC
-                "inputSchema": {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "type": "object",
-                    "properties": {
-                        "token_in": {
-                            "type": "string",
-                            "description": "Input token address or symbol"
-                        },
-                        "token_out": {
-                            "type": "string",
-                            "description": "Output token address or symbol"
-                        },
-                        "amount_in": {
-                            "type": "string",
-                            "description": "Amount to swap in token units"
-                        },
-                        "chain_id": {
-                            "type": "number",
-                            "description": "Chain ID to scan DEXes on"
-                        }
-                    },
-                    "required": ["token_in", "token_out", "amount_in", "chain_id"]
-                },
                 "outputSchema": {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "type": "object",
-                    "description": "Cross-DEX arbitrage opportunities with profit calculations",
-                    "properties": {
-                        "token_in": {
-                            "type": "string",
-                            "description": "Input token address or symbol"
-                        },
-                        "token_out": {
-                            "type": "string",
-                            "description": "Output token address or symbol"
-                        },
-                        "amount_in": {
-                            "type": "string",
-                            "description": "Amount to swap in token units"
-                        },
-                        "chain_id": {
-                            "type": "number",
-                            "description": "Chain ID to scan DEXes on"
+                    "input": {
+                        "type": "http",
+                        "method": "POST",
+                        "bodyType": "json",
+                        "bodyFields": {
+                            "token_in": {"type": "string", "required": True, "description": "Input token address or symbol"},
+                            "token_out": {"type": "string", "required": True, "description": "Output token address or symbol"},
+                            "amount_in": {"type": "string", "required": True, "description": "Amount to swap in token units"},
+                            "chain_id": {"type": "number", "required": True, "description": "Chain ID to scan DEXes on"}
                         }
                     },
-                    "required": ["token_in", "token_out", "amount_in", "chain_id"]
+                    "output": {"type": "object", "description": "Cross-DEX arbitrage opportunities with profit calculations"}
                 }
             }]
         }
