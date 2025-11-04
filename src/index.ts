@@ -40,7 +40,7 @@ const { app, addEntrypoint, config } = createAgentApp(
         payTo: "0x01D11F7e1a46AbFC6092d7be484895D2d505095c",
         network: "base",
         asset: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        defaultPrice: "100000", // 0.10 USDC
+        defaultPrice: "$0.10", // 0.10 USDC
       },
     },
     useConfigPayments: true,
@@ -155,7 +155,7 @@ addEntrypoint({
   description: "Scan for arbitrage opportunities across DEXes with configurable profit thresholds",
   input: ArbitrageInputSchema,
   output: ArbitrageOutputSchema,
-  price: "100000", // 0.10 USDC
+  price: "$0.10", // 0.10 USDC
   async handler({ input }) {
     const opportunities = await findArbitrage(
       input.chain_id,
